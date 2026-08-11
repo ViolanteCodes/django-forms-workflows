@@ -42,7 +42,7 @@ export const propertyEditorMethods = {
     },
 
     buildPropertiesForm(node) {
-        let html = `<h6 class="mb-3">${this.getNodeTypeLabel(node.type)}</h6>`;
+        let html = `<h6 class="mb-3">${this.escapeHtml(this.getNodeTypeLabel(node.type))}</h6>`;
         html += this.buildNodeIssuesAlert(node);
 
         switch (node.type) {
@@ -112,7 +112,7 @@ export const propertyEditorMethods = {
             <div class="mb-3">
                 <label class="form-label"><strong>Order</strong></label>
                 <input type="number" class="form-control" name="order" min="1"
-                       value="${data.order || 1}"
+                       value="${this.escapeHtml(String(data.order || 1))}"
                        onchange="workflowBuilder.updateStageConfig('${node.id}')" />
                 <small class="text-muted">Stages with the same order number run in parallel (fork/join).</small>
             </div>
@@ -183,7 +183,7 @@ export const propertyEditorMethods = {
 
         this.groups.forEach(group => {
             const selected = selectedGroupIds.includes(group.id) ? 'selected' : '';
-            routingSection += `<option value="${group.id}" ${selected}>${this.escapeHtml(group.name)}</option>`;
+            routingSection += `<option value="${this.escapeHtml(String(group.id))}" ${selected}>${this.escapeHtml(group.name)}</option>`;
         });
 
         routingSection += `
@@ -210,7 +210,7 @@ export const propertyEditorMethods = {
                 <select class="form-select builder-multiselect-lg" id="stage_fields_${node.id}" name="approval_fields" multiple size="6"
                         onchange="workflowBuilder.updateStageConfig('${node.id}')">
                     ${this.fields.map(field => `
-                        <option value="${field.id}" ${selectedApprovalFieldIds.has(field.id) ? 'selected' : ''}>${this.escapeHtml(field.field_label)} (${field.field_name})</option>
+                        <option value="${this.escapeHtml(String(field.id))}" ${selectedApprovalFieldIds.has(field.id) ? 'selected' : ''}>${this.escapeHtml(field.field_label)} (${this.escapeHtml(field.field_name)})</option>
                     `).join('')}
                 </select>
                 <small class="text-muted d-block mt-1">Selected fields become editable approval-step fields for this stage only.</small>
@@ -224,7 +224,7 @@ export const propertyEditorMethods = {
                         onchange="workflowBuilder.updateStageConfig('${node.id}')">
                     <option value="">-- Use approval groups --</option>
                     ${this.fields.map(f => `
-                        <option value="${f.field_name}" ${data.assignee_form_field === f.field_name ? 'selected' : ''}>${this.escapeHtml(f.field_label)} (${f.field_name})</option>
+                        <option value="${this.escapeHtml(f.field_name)}" ${data.assignee_form_field === f.field_name ? 'selected' : ''}>${this.escapeHtml(f.field_label)} (${this.escapeHtml(f.field_name)})</option>
                     `).join('')}
                 </select>
                 <small class="text-muted">When selected, the stage resolves the approver from a submitted form field before falling back to approval groups.</small>
@@ -344,19 +344,19 @@ export const propertyEditorMethods = {
             <div class="mb-3">
                 <label class="form-label">Approval Deadline (days)</label>
                 <input type="number" class="form-control" name="approval_deadline_days" min="1"
-                       value="${data.approval_deadline_days || ''}" placeholder="No deadline"
+                       value="${this.escapeHtml(String(data.approval_deadline_days || ''))}" placeholder="No deadline"
                        onchange="workflowBuilder.updateWorkflowSettings('${node.id}')" />
             </div>
             <div class="mb-3">
                 <label class="form-label">Send Reminder After (days)</label>
                 <input type="number" class="form-control" name="send_reminder_after_days" min="1"
-                       value="${data.send_reminder_after_days || ''}" placeholder="No reminder"
+                       value="${this.escapeHtml(String(data.send_reminder_after_days || ''))}" placeholder="No reminder"
                        onchange="workflowBuilder.updateWorkflowSettings('${node.id}')" />
             </div>
             <div class="mb-3">
                 <label class="form-label">Auto-Approve After (days)</label>
                 <input type="number" class="form-control" name="auto_approve_after_days" min="1"
-                       value="${data.auto_approve_after_days || ''}" placeholder="Never"
+                       value="${this.escapeHtml(String(data.auto_approve_after_days || ''))}" placeholder="Never"
                        onchange="workflowBuilder.updateWorkflowSettings('${node.id}')" />
             </div>
             <div class="mb-3">
@@ -374,7 +374,7 @@ export const propertyEditorMethods = {
             <div class="mb-3">
                 <label class="form-label">Digest Day</label>
                 <input type="number" class="form-control" name="notification_cadence_day" min="0" max="31"
-                       value="${data.notification_cadence_day || ''}" placeholder="Weekly: 0-6, Monthly: 1-31"
+                       value="${this.escapeHtml(String(data.notification_cadence_day || ''))}" placeholder="Weekly: 0-6, Monthly: 1-31"
                        onchange="workflowBuilder.updateWorkflowSettings('${node.id}')" />
                 <small class="text-muted">Used for weekly and monthly cadences only.</small>
             </div>
@@ -392,7 +392,7 @@ export const propertyEditorMethods = {
                         onchange="workflowBuilder.updateWorkflowSettings('${node.id}')">
                     <option value="">-- Select a date field --</option>
                     ${this.fields.map(f => `
-                        <option value="${f.field_name}" ${data.notification_cadence_form_field === f.field_name ? 'selected' : ''}>${this.escapeHtml(f.field_label)} (${f.field_name})</option>
+                        <option value="${this.escapeHtml(f.field_name)}" ${data.notification_cadence_form_field === f.field_name ? 'selected' : ''}>${this.escapeHtml(f.field_label)} (${this.escapeHtml(f.field_name)})</option>
                     `).join('')}
                 </select>
                 <small class="text-muted">Used only when cadence is “On Date From Form Field”.</small>
@@ -465,7 +465,7 @@ export const propertyEditorMethods = {
                 const state = this.getNotificationRuleState(rule || {});
                 const selectedGroupIds = new Set((state.notify_groups || []).map(group => group.id));
                 return `
-                    <div class="card mb-3 notification-rule-card" data-rule-index="${index}" data-rule-id="${state.rule_id || ''}">
+                    <div class="card mb-3 notification-rule-card" data-rule-index="${index}" data-rule-id="${this.escapeHtml(String(state.rule_id || ''))}">
                         <div class="card-body py-3">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <h6 class="mb-0">Rule ${index + 1}</h6>
@@ -482,7 +482,7 @@ export const propertyEditorMethods = {
                                         onchange="workflowBuilder.updateNotificationRules('${node.id}')">
                                     <option value="">Workflow-level</option>
                                     ${stageOptions.map(option => `
-                                        <option value="${option.nodeId}" ${state.stage_node_id === option.nodeId ? 'selected' : ''}>Stage ${option.order}: ${this.escapeHtml(option.name)}</option>
+                                        <option value="${option.nodeId}" ${state.stage_node_id === option.nodeId ? 'selected' : ''}>Stage ${this.escapeHtml(String(option.order))}: ${this.escapeHtml(option.name)}</option>
                                     `).join('')}
                                 </select>
                             </div>
@@ -508,7 +508,7 @@ export const propertyEditorMethods = {
                                         onchange="workflowBuilder.updateNotificationRules('${node.id}')">
                                     <option value="">-- None --</option>
                                     ${this.fields.map(field => `
-                                        <option value="${field.field_name}" ${state.email_field === field.field_name ? 'selected' : ''}>${this.escapeHtml(field.field_label)} (${field.field_name})</option>
+                                        <option value="${this.escapeHtml(field.field_name)}" ${state.email_field === field.field_name ? 'selected' : ''}>${this.escapeHtml(field.field_label)} (${this.escapeHtml(field.field_name)})</option>
                                     `).join('')}
                                 </select>
                             </div>
@@ -524,7 +524,7 @@ export const propertyEditorMethods = {
                                 <select class="form-select form-select-sm" name="notification_rule_notify_groups" multiple size="4"
                                         onchange="workflowBuilder.updateNotificationRules('${node.id}')">
                                     ${this.groups.map(group => `
-                                        <option value="${group.id}" ${selectedGroupIds.has(group.id) ? 'selected' : ''}>${this.escapeHtml(group.name)}</option>
+                                        <option value="${this.escapeHtml(String(group.id))}" ${selectedGroupIds.has(group.id) ? 'selected' : ''}>${this.escapeHtml(group.name)}</option>
                                     `).join('')}
                                 </select>
                             </div>
@@ -638,7 +638,7 @@ export const propertyEditorMethods = {
                                 onchange="${onChangeHandler}">
                             <option value="">-- Select field --</option>
                             ${this.fields.map(field => `
-                                <option value="${field.field_name}" ${condition.field === field.field_name ? 'selected' : ''}>${this.escapeHtml(field.field_label)} (${field.field_name})</option>
+                                <option value="${this.escapeHtml(field.field_name)}" ${condition.field === field.field_name ? 'selected' : ''}>${this.escapeHtml(field.field_label)} (${this.escapeHtml(field.field_name)})</option>
                             `).join('')}
                         </select>
                     </div>
@@ -736,7 +736,7 @@ export const propertyEditorMethods = {
 
             this.forms.forEach(form => {
                 const selected = data.form_id == form.id ? 'selected' : '';
-                html += `<option value="${form.id}" ${selected}>${this.escapeHtml(form.name)} (${form.field_count} fields)</option>`;
+                html += `<option value="${form.id}" ${selected}>${this.escapeHtml(form.name)} (${this.escapeHtml(String(form.field_count))} fields)</option>`;
             });
 
             html += `
@@ -757,7 +757,7 @@ export const propertyEditorMethods = {
         html += `
             <div class="mb-3">
                 <label class="form-label">Total Fields</label>
-                <input type="text" class="form-control" value="${data.field_count || 0}" disabled />
+                <input type="text" class="form-control" value="${this.escapeHtml(String(data.field_count || 0))}" disabled />
             </div>
         `;
 
@@ -766,7 +766,7 @@ export const propertyEditorMethods = {
             html += `
                 <div class="alert alert-success">
                     <i class="bi bi-list-ol"></i> <strong>Multi-Step Form</strong>
-                    <br><small class="text-muted">${data.step_count} step${data.step_count > 1 ? 's' : ''} configured</small>
+                    <br><small class="text-muted">${this.escapeHtml(String(data.step_count))} step${data.step_count > 1 ? 's' : ''} configured</small>
                 </div>
             `;
 
@@ -845,7 +845,7 @@ export const propertyEditorMethods = {
 
         html += `
             <div class="mt-3">
-                <a href="${data.form_builder_url || '#'}" target="_blank" class="btn btn-outline-primary btn-sm w-100">
+                <a href="${this.escapeHtml(data.form_builder_url || '#')}" target="_blank" class="btn btn-outline-primary btn-sm w-100">
                     <i class="bi bi-pencil-square"></i> Edit Form in Form Builder
                 </a>
             </div>
@@ -934,10 +934,10 @@ export const propertyEditorMethods = {
     buildEmailProperties(node) {
         const data = node.data || {};
         const fieldOptions = this.fields.map(f => `
-            <option value="${f.field_name}" ${data.email_to_field === f.field_name ? 'selected' : ''}>${this.escapeHtml(f.field_label)} (${f.field_name})</option>
+            <option value="${this.escapeHtml(f.field_name)}" ${data.email_to_field === f.field_name ? 'selected' : ''}>${this.escapeHtml(f.field_label)} (${this.escapeHtml(f.field_name)})</option>
         `).join('');
         const ccFieldOptions = this.fields.map(f => `
-            <option value="${f.field_name}" ${data.email_cc_field === f.field_name ? 'selected' : ''}>${this.escapeHtml(f.field_label)} (${f.field_name})</option>
+            <option value="${this.escapeHtml(f.field_name)}" ${data.email_cc_field === f.field_name ? 'selected' : ''}>${this.escapeHtml(f.field_label)} (${this.escapeHtml(f.field_name)})</option>
         `).join('');
         return `
             <div class="mb-3">
@@ -999,14 +999,14 @@ export const propertyEditorMethods = {
         let workflowOptions = '<option value="">-- Select a workflow --</option>';
         this.workflowTargets.forEach(target => {
             const selected = (data.sub_workflow_id == target.workflow_id) ? 'selected' : '';
-            workflowOptions += `<option value="${target.workflow_id}" data-form-id="${target.form_id}" ${selected}>${this.escapeHtml(target.workflow_label)} (${target.field_count} fields)</option>`;
+            workflowOptions += `<option value="${this.escapeHtml(String(target.workflow_id))}" data-form-id="${this.escapeHtml(String(target.form_id))}" ${selected}>${this.escapeHtml(target.workflow_label)} (${this.escapeHtml(String(target.field_count))} fields)</option>`;
         });
 
         // Build count field options from this.fields
         let fieldOptions = '<option value="">-- Select a field --</option>';
         this.fields.forEach(f => {
             const selected = (data.count_field === f.field_name) ? 'selected' : '';
-            fieldOptions += `<option value="${f.field_name}" ${selected}>${this.escapeHtml(f.field_label)} (${f.field_name})</option>`;
+            fieldOptions += `<option value="${this.escapeHtml(f.field_name)}" ${selected}>${this.escapeHtml(f.field_label)} (${this.escapeHtml(f.field_name)})</option>`;
         });
 
         const targetSection = `
