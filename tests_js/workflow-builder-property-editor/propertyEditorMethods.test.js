@@ -658,6 +658,17 @@ describe('propertyEditorMethods.updateSubWorkflowConfig', () => {
     expect(() => ctx.updateSubWorkflowConfig('missing')).not.toThrow();
     expect(ctx.render).not.toHaveBeenCalled();
   });
+
+  it('fires nodes-changed so listeners see the update', () => {
+    const node = { id: 'n1', data: {} };
+    const ctx = createContext({ nodes: [node] });
+    const listener = vi.fn();
+    ctx.store.addEventListener('nodes-changed', listener);
+
+    ctx.updateSubWorkflowConfig('n1');
+
+    expect(listener).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('propertyEditorMethods.buildEndProperties', () => {
@@ -680,6 +691,17 @@ describe('propertyEditorMethods.updateNodeProperty', () => {
     const ctx = createContext({ nodes: [] });
     expect(() => ctx.updateNodeProperty('missing', 'x', 1)).not.toThrow();
     expect(ctx.render).not.toHaveBeenCalled();
+  });
+
+  it('fires nodes-changed so listeners see the update', () => {
+    const node = { id: 'n1', data: { x: 1 } };
+    const ctx = createContext({ nodes: [node] });
+    const listener = vi.fn();
+    ctx.store.addEventListener('nodes-changed', listener);
+
+    ctx.updateNodeProperty('n1', 'x', 42);
+
+    expect(listener).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -705,6 +727,17 @@ describe('propertyEditorMethods.updateFormSelection', () => {
     ctx.updateFormSelection('n1', '');
 
     expect(node.data).toMatchObject({ form_id: null, form_name: 'Select Form', form_builder_url: '#', field_count: 0, fields: [], has_more_fields: false });
+  });
+
+  it('fires nodes-changed so listeners see the update', () => {
+    const node = { id: 'n1', data: {} };
+    const ctx = createContext({ nodes: [node], forms: [{ id: 5, name: 'Vacation Request', field_count: 3 }] });
+    const listener = vi.fn();
+    ctx.store.addEventListener('nodes-changed', listener);
+
+    ctx.updateFormSelection('n1', '5');
+
+    expect(listener).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -771,6 +804,18 @@ describe('propertyEditorMethods.updateStageConfig', () => {
 
     expect(node.data.order).toBe(1);
   });
+
+  it('fires nodes-changed so listeners see the update', () => {
+    buildFixture();
+    const node = { id: 'n1', data: {} };
+    const ctx = createContext({ nodes: [node] });
+    const listener = vi.fn();
+    ctx.store.addEventListener('nodes-changed', listener);
+
+    ctx.updateStageConfig('n1');
+
+    expect(listener).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('propertyEditorMethods.updateWorkflowSettings', () => {
@@ -811,6 +856,18 @@ describe('propertyEditorMethods.updateWorkflowSettings', () => {
       trigger_conditions: { operator: 'AND', conditions: [] },
     });
     expect(ctx.render).toHaveBeenCalled();
+  });
+
+  it('fires nodes-changed so listeners see the update', () => {
+    buildFixture();
+    const node = { id: 'n1', data: {} };
+    const ctx = createContext({ nodes: [node] });
+    const listener = vi.fn();
+    ctx.store.addEventListener('nodes-changed', listener);
+
+    ctx.updateWorkflowSettings('n1');
+
+    expect(listener).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -969,6 +1026,17 @@ describe('propertyEditorMethods.moveStageApprovalGroup', () => {
     expect(node.data.approval_groups.map((g) => g.id)).toEqual([1, 2]);
     expect(ctx.render).not.toHaveBeenCalled();
   });
+
+  it('fires nodes-changed when a swap happens', () => {
+    const node = { id: 'n1', data: { approval_groups: [{ id: 1, name: 'A', position: 0 }, { id: 2, name: 'B', position: 1 }] } };
+    const ctx = createContext({ nodes: [node] });
+    const listener = vi.fn();
+    ctx.store.addEventListener('nodes-changed', listener);
+
+    ctx.moveStageApprovalGroup('n1', 2, -1);
+
+    expect(listener).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('propertyEditorMethods.readNotificationRulesFromPanel', () => {
@@ -1027,6 +1095,17 @@ describe('propertyEditorMethods.addNotificationRule', () => {
     expect(ctx.render).toHaveBeenCalled();
     expect(ctx.selectNode).toHaveBeenCalledWith('n1');
   });
+
+  it('fires nodes-changed so listeners see the update', () => {
+    const node = { id: 'n1', data: { notification_rules: [] } };
+    const ctx = createContext({ nodes: [node] });
+    const listener = vi.fn();
+    ctx.store.addEventListener('nodes-changed', listener);
+
+    ctx.addNotificationRule('n1');
+
+    expect(listener).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('propertyEditorMethods.removeNotificationRule', () => {
@@ -1037,6 +1116,17 @@ describe('propertyEditorMethods.removeNotificationRule', () => {
     ctx.removeNotificationRule('n1', 0);
 
     expect(node.data.notification_rules).toEqual([{ event: 'b' }]);
+  });
+
+  it('fires nodes-changed so listeners see the update', () => {
+    const node = { id: 'n1', data: { notification_rules: [{ event: 'a' }] } };
+    const ctx = createContext({ nodes: [node] });
+    const listener = vi.fn();
+    ctx.store.addEventListener('nodes-changed', listener);
+
+    ctx.removeNotificationRule('n1', 0);
+
+    expect(listener).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -1050,6 +1140,17 @@ describe('propertyEditorMethods.addNotificationRuleCondition', () => {
     expect(node.data.notification_rules[0].conditions).toEqual({
       operator: 'AND', conditions: [{ field: '', operator: 'equals', value: '' }],
     });
+  });
+
+  it('fires nodes-changed so listeners see the update', () => {
+    const node = { id: 'n1', data: { notification_rules: [{ conditions: null }] } };
+    const ctx = createContext({ nodes: [node] });
+    const listener = vi.fn();
+    ctx.store.addEventListener('nodes-changed', listener);
+
+    ctx.addNotificationRuleCondition('n1', 0);
+
+    expect(listener).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -1065,6 +1166,20 @@ describe('propertyEditorMethods.removeNotificationRuleCondition', () => {
 
     expect(node.data.notification_rules[0].conditions).toBeNull();
   });
+
+  it('fires nodes-changed so listeners see the update', () => {
+    const node = {
+      id: 'n1',
+      data: { notification_rules: [{ conditions: { operator: 'AND', conditions: [{ field: 'a', operator: 'equals', value: '1' }] } }] },
+    };
+    const ctx = createContext({ nodes: [node] });
+    const listener = vi.fn();
+    ctx.store.addEventListener('nodes-changed', listener);
+
+    ctx.removeNotificationRuleCondition('n1', 0, 0);
+
+    expect(listener).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('propertyEditorMethods.updateNotificationRules', () => {
@@ -1079,6 +1194,18 @@ describe('propertyEditorMethods.updateNotificationRules', () => {
     expect(node.data.notification_rules).toEqual(['__RULES__']);
     expect(ctx.render).toHaveBeenCalled();
   });
+
+  it('fires nodes-changed so listeners see the update', () => {
+    document.body.innerHTML = '<div id="propertiesContent"></div>';
+    const node = { id: 'n1', data: {} };
+    const ctx = createContext({ nodes: [node] });
+    const listener = vi.fn();
+    ctx.store.addEventListener('nodes-changed', listener);
+
+    ctx.updateNotificationRules('n1');
+
+    expect(listener).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('propertyEditorMethods.addTriggerCondition', () => {
@@ -1090,6 +1217,17 @@ describe('propertyEditorMethods.addTriggerCondition', () => {
 
     expect(node.data.trigger_conditions).toEqual({ operator: 'AND', conditions: [{ field: '', operator: 'equals', value: '' }] });
   });
+
+  it('fires nodes-changed so listeners see the update', () => {
+    const node = { id: 'n1', data: { trigger_conditions: null } };
+    const ctx = createContext({ nodes: [node] });
+    const listener = vi.fn();
+    ctx.store.addEventListener('nodes-changed', listener);
+
+    ctx.addTriggerCondition('n1');
+
+    expect(listener).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('propertyEditorMethods.removeTriggerCondition', () => {
@@ -1100,6 +1238,17 @@ describe('propertyEditorMethods.removeTriggerCondition', () => {
     ctx.removeTriggerCondition('n1', 0);
 
     expect(node.data.trigger_conditions).toBeNull();
+  });
+
+  it('fires nodes-changed so listeners see the update', () => {
+    const node = { id: 'n1', data: { trigger_conditions: { operator: 'AND', conditions: [{ field: 'a', operator: 'equals', value: '1' }] } } };
+    const ctx = createContext({ nodes: [node] });
+    const listener = vi.fn();
+    ctx.store.addEventListener('nodes-changed', listener);
+
+    ctx.removeTriggerCondition('n1', 0);
+
+    expect(listener).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -1113,6 +1262,18 @@ describe('propertyEditorMethods.updateNodeTriggerConditions', () => {
     ctx.updateNodeTriggerConditions('n1');
 
     expect(node.data.trigger_conditions).toBe('__CONDITIONS__');
+  });
+
+  it('fires nodes-changed so listeners see the update', () => {
+    document.body.innerHTML = '<div id="propertiesContent"></div>';
+    const node = { id: 'n1', data: {} };
+    const ctx = createContext({ nodes: [node] });
+    const listener = vi.fn();
+    ctx.store.addEventListener('nodes-changed', listener);
+
+    ctx.updateNodeTriggerConditions('n1');
+
+    expect(listener).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -1133,6 +1294,25 @@ describe('propertyEditorMethods.updateActionConfig', () => {
 
     expect(node.data).toMatchObject({ name: 'Sync LDAP', action_type: 'ldap', trigger: 'on_approve', config: '{"a":1}' });
     expect(ctx.render).toHaveBeenCalled();
+  });
+
+  it('fires nodes-changed so listeners see the update', () => {
+    document.body.innerHTML = `
+      <div id="propertiesContent">
+        <input name="name" value="Sync LDAP" />
+        <select name="action_type"><option value="ldap" selected>LDAP Update</option></select>
+        <select name="trigger"><option value="on_approve" selected>On Approval</option></select>
+        <textarea name="config">{"a":1}</textarea>
+      </div>
+    `;
+    const node = { id: 'n1', data: {} };
+    const ctx = createContext({ nodes: [node] });
+    const listener = vi.fn();
+    ctx.store.addEventListener('nodes-changed', listener);
+
+    ctx.updateActionConfig('n1');
+
+    expect(listener).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -1163,5 +1343,29 @@ describe('propertyEditorMethods.updateEmailConfig', () => {
     });
     expect(ctx.render).toHaveBeenCalled();
     expect(ctx.selectNode).toHaveBeenCalledWith('n1');
+  });
+
+  it('fires nodes-changed so listeners see the update', () => {
+    document.body.innerHTML = `
+      <div id="propertiesContent">
+        <input name="name" value="Notify Approver" />
+        <input name="email_to" value="a@b.com" />
+        <select name="email_to_field"><option value="requester" selected>Requester</option></select>
+        <input name="email_cc" value="c@d.com" />
+        <select name="email_cc_field"><option value="" selected></option></select>
+        <input name="email_subject_template" value="Approved" />
+        <textarea name="email_body_template">Body</textarea>
+        <input name="email_template_name" value="emails/approval.html" />
+        <select name="trigger"><option value="on_complete" selected>On Complete</option></select>
+      </div>
+    `;
+    const node = { id: 'n1', data: {} };
+    const ctx = createContext({ nodes: [node] });
+    const listener = vi.fn();
+    ctx.store.addEventListener('nodes-changed', listener);
+
+    ctx.updateEmailConfig('n1');
+
+    expect(listener).toHaveBeenCalledTimes(1);
   });
 });

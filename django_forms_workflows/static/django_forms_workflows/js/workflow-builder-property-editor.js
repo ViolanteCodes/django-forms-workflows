@@ -1123,6 +1123,7 @@ export const propertyEditorMethods = {
         node.data.detached = container.querySelector(`#sub_wf_detached_${nodeId}`).checked;
         node.data.reject_parent = container.querySelector(`#sub_wf_reject_parent_${nodeId}`).checked;
 
+        this.nodes = [...this.nodes];
         this.render();
         this.selectNode(nodeId);
     },
@@ -1143,6 +1144,7 @@ export const propertyEditorMethods = {
         const node = this.nodes.find(n => n.id === nodeId);
         if (node) {
             node.data[property] = value;
+            this.nodes = [...this.nodes];
             this.render();
         }
     },
@@ -1174,6 +1176,7 @@ export const propertyEditorMethods = {
         }
 
         // Re-render to update the node display and properties panel
+        this.nodes = [...this.nodes];
         this.render();
         this.selectNode(nodeId); // Re-select to refresh properties panel
     },
@@ -1202,6 +1205,7 @@ export const propertyEditorMethods = {
         node.data.approval_fields = this.readStageApprovalFieldsFromPanel(container, nodeId);
         node.data.approval_logic = container.querySelector('select[name="approval_logic"]').value;
 
+        this.nodes = [...this.nodes];
         this.render();
         this.selectNode(nodeId);
     },
@@ -1227,6 +1231,7 @@ export const propertyEditorMethods = {
         node.data.notification_rules = this.readNotificationRulesFromPanel(container);
         node.data.trigger_conditions = this.readNodeTriggerConditions(container);
 
+        this.nodes = [...this.nodes];
         this.render();
         this.selectNode(nodeId);
     },
@@ -1319,6 +1324,7 @@ export const propertyEditorMethods = {
 
         [groups[currentIndex], groups[targetIndex]] = [groups[targetIndex], groups[currentIndex]];
         node.data.approval_groups = groups.map((group, index) => ({ ...group, position: index }));
+        this.nodes = [...this.nodes];
         this.render();
         this.selectNode(nodeId);
     },
@@ -1362,6 +1368,7 @@ export const propertyEditorMethods = {
         if (!node) return;
 
         node.data.notification_rules = [...(node.data.notification_rules || []), this.getNotificationRuleState({})];
+        this.nodes = [...this.nodes];
         this.render();
         this.selectNode(nodeId);
     },
@@ -1373,6 +1380,7 @@ export const propertyEditorMethods = {
         const rules = [...(node.data.notification_rules || [])];
         rules.splice(index, 1);
         node.data.notification_rules = rules;
+        this.nodes = [...this.nodes];
         this.render();
         this.selectNode(nodeId);
     },
@@ -1387,6 +1395,7 @@ export const propertyEditorMethods = {
         state.conditions.push({ field: '', operator: 'equals', value: '' });
         rules[ruleIndex] = { ...rule, conditions: state };
         node.data.notification_rules = rules;
+        this.nodes = [...this.nodes];
         this.render();
         this.selectNode(nodeId);
     },
@@ -1401,6 +1410,7 @@ export const propertyEditorMethods = {
         state.conditions.splice(conditionIndex, 1);
         rules[ruleIndex] = { ...rule, conditions: state.conditions.length ? state : null };
         node.data.notification_rules = rules;
+        this.nodes = [...this.nodes];
         this.render();
         this.selectNode(nodeId);
     },
@@ -1411,6 +1421,7 @@ export const propertyEditorMethods = {
 
         const container = document.getElementById('propertiesContent');
         node.data.notification_rules = this.readNotificationRulesFromPanel(container);
+        this.nodes = [...this.nodes];
         this.render();
         this.selectNode(nodeId);
     },
@@ -1422,6 +1433,7 @@ export const propertyEditorMethods = {
         const state = this.getNormalizedTriggerConditions(node.data.trigger_conditions);
         state.conditions.push({ field: '', operator: 'equals', value: '' });
         node.data.trigger_conditions = state;
+        this.nodes = [...this.nodes];
         this.render();
         this.selectNode(nodeId);
     },
@@ -1433,6 +1445,7 @@ export const propertyEditorMethods = {
         const state = this.getNormalizedTriggerConditions(node.data.trigger_conditions);
         state.conditions.splice(index, 1);
         node.data.trigger_conditions = state.conditions.length ? state : null;
+        this.nodes = [...this.nodes];
         this.render();
         this.selectNode(nodeId);
     },
@@ -1443,6 +1456,7 @@ export const propertyEditorMethods = {
 
         const container = document.getElementById('propertiesContent');
         node.data.trigger_conditions = this.readNodeTriggerConditions(container);
+        this.nodes = [...this.nodes];
         this.render();
         this.selectNode(nodeId);
     },
@@ -1457,6 +1471,7 @@ export const propertyEditorMethods = {
         node.data.trigger = container.querySelector('select[name="trigger"]').value;
         node.data.config = container.querySelector('textarea[name="config"]').value;
 
+        this.nodes = [...this.nodes];
         this.render();
         this.selectNode(nodeId);
     },
@@ -1476,6 +1491,7 @@ export const propertyEditorMethods = {
         node.data.email_template_name = container.querySelector('input[name="email_template_name"]').value;
         node.data.trigger = container.querySelector('select[name="trigger"]').value;
 
+        this.nodes = [...this.nodes];
         this.render();
         this.selectNode(nodeId);
     },
