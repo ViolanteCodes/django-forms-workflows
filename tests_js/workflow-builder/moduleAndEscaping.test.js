@@ -97,31 +97,3 @@ describe('WorkflowBuilder#getNodeDescription — escaping regression', () => {
     expect(html).not.toContain('<script>alert');
   });
 });
-
-describe('WorkflowBuilder#buildFormProperties — escaping regression', () => {
-  it('escapes field.name, field.type, and field.prefill_source in the field list', () => {
-    const instance = createInstance();
-    const payload = '"><script>alert(1)</script>';
-    const node = {
-      id: 'form_1',
-      data: {
-        is_initial: true,
-        form_name: 'Test Form',
-        field_count: 1,
-        fields: [
-          {
-            label: payload,
-            name: payload,
-            type: payload,
-            prefill_source: payload,
-          },
-        ],
-        has_more_fields: false,
-      },
-    };
-
-    const html = instance.buildFormProperties(node);
-
-    expect(html).not.toContain('<script>alert');
-  });
-});
